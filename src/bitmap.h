@@ -1,10 +1,12 @@
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include "bitmapwrite.h"
 
 void draw_centered_rectangle(size_t width, size_t height);
 void drawLine(float startX, float startY, float endX, float endY, size_t width, size_t height);
 void drawPolygon(const std::vector<Vertex2> &points, size_t width, size_t height);
+void fillPolygon(const std::vector<Vertex2>& vertices, size_t width, size_t height);
 
 void render()
 {
@@ -16,16 +18,6 @@ void render()
     clear();
 
     setCurrentColor(Color(255, 0, 0));
-    /* draw_centered_rectangle(150, 150);
-
-    setCurrentColor(Color(0, 255, 0));
-    draw_centered_rectangle(100, 100);
-
-    setCurrentColor(Color(0, 0, 255));
-    draw_centered_rectangle(50, 50);
-
-    drawLine(0, 0, 800, 600, framebufferWidth, framebufferHeight);
-    drawLine(0, 600, 800, 0, framebufferWidth, framebufferHeight); */
 
     std::vector<Vertex2> starPoints = {
         {200.0f, 50.0f},
@@ -41,6 +33,7 @@ void render()
     };
 
     drawPolygon(starPoints, framebufferWidth, framebufferHeight);
+    fillPolygon(starPoints, framebufferWidth, framebufferHeight);
 
     renderBuffer();
 }
@@ -121,5 +114,40 @@ void drawPolygon(const std::vector<Vertex2> &points, size_t width, size_t height
         const Vertex2 &endPoint = points[(i + 1) % numPoints]; // Punto siguiente (o primer punto si es el último)
 
         drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, width, height);
+    }
+}
+
+void fillPolygon(const std::vector<Vertex2>& vertices, size_t width, size_t height) {
+    std::vector<int> yValues;
+    for (const Vertex2& vertex : vertices) {
+        yValues.push_back(static_cast<int>(vertex.y));
+    }
+
+    std::sort(yValues.begin(), yValues.end());
+
+    for (int y = yValues.front(); y <= yValues.back(); y++) {
+        std::vector<float> xIntercepts;
+        for (size_t i = 0; i < vertices.size(); i++) {
+            const Vertex2& currentVertex = vertices[i];
+            const Vertex2& nextVertex = vertices[(i + 1) % vertices.size()];
+
+            if ((currentVertex.y <= static_cast<float>(y) && nextVertex.y > static_cast<float>(y))
+                || (nextVertex.y <= static_cast<float>(y) && currentVertex.y > static_cast<float>(y))) {
+                float xIntercept = currentVertex.x + (static_cast<float>(y) - currentVertex.y) *
+                    (nextVertex.x - currentVertex.x) / (nextVertex.y - currentVertex.y);
+                xIntercepts.push_back(xIntercept);
+            }
+        }
+
+        std::sort(xIntercepts.begin(), xIntercepts.end());
+
+        for (size_t i = 0; i < xIntercepts.size(); i += 2) {
+            int startX = static_cast<int>(xIntercepts[i]);
+            int endX = static_cast<int>(xIntercepts[i + 1]);
+
+            for (int x = startX; x <= endX; x++) {
+                point(Vertex2{ static_cast<float>(x), static_cast<float>(y) }, width, height);
+            }
+        }
     }
 }
