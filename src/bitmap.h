@@ -6,7 +6,7 @@
 void draw_centered_rectangle(size_t width, size_t height);
 void drawLine(float startX, float startY, float endX, float endY, size_t width, size_t height);
 void drawPolygon(const std::vector<Vertex2> &points, size_t width, size_t height);
-void fillPolygon(const std::vector<Vertex2>& vertices, size_t width, size_t height);
+void fillPolygon(const std::vector<Vertex2> &vertices, size_t width, size_t height);
 
 void render()
 {
@@ -17,23 +17,22 @@ void render()
     setClearColor(Color(46, 52, 64));
     clear();
 
-    setCurrentColor(Color(255, 0, 0));
-
-    std::vector<Vertex2> starPoints = {
-        {200.0f, 50.0f},
-        {250.0f, 200.0f},
-        {400.0f, 220.0f},
-        {275.0f, 300.0f},
-        {325.0f, 450.0f},
-        {200.0f, 375.0f},
-        {75.0f, 450.0f},
-        {125.0f, 300.0f},
-        {-10.0f, 220.0f},
-        {150.0f, 200.0f},
-    };
-
-    drawPolygon(starPoints, framebufferWidth, framebufferHeight);
-    fillPolygon(starPoints, framebufferWidth, framebufferHeight);
+    std::vector<Vertex2> polygon = {
+        {165.0f, 380.0f},
+        {185.0f, 360.0f},
+        {180.0f, 330.0f},
+        {207.0f, 345.0f},
+        {233.0f, 330.0f},
+        {230.0f, 360.0f},
+        {250.0f, 380.0f},
+        {220.0f, 385.0f},
+        {205.0f, 410.0f},
+        {193.0f, 383.0f}};
+    
+    setCurrentColor(Color(255, 255, 255));
+    drawPolygon(polygon, framebufferWidth, framebufferHeight);
+    setCurrentColor(Color(255, 255, 0));
+    fillPolygon(polygon, framebufferWidth, framebufferHeight);
 
     renderBuffer();
 }
@@ -117,36 +116,42 @@ void drawPolygon(const std::vector<Vertex2> &points, size_t width, size_t height
     }
 }
 
-void fillPolygon(const std::vector<Vertex2>& vertices, size_t width, size_t height) {
+void fillPolygon(const std::vector<Vertex2> &vertices, size_t width, size_t height)
+{
     std::vector<int> yValues;
-    for (const Vertex2& vertex : vertices) {
+    for (const Vertex2 &vertex : vertices)
+    {
         yValues.push_back(static_cast<int>(vertex.y));
     }
 
     std::sort(yValues.begin(), yValues.end());
 
-    for (int y = yValues.front(); y <= yValues.back(); y++) {
+    for (int y = yValues.front(); y <= yValues.back(); y++)
+    {
         std::vector<float> xIntercepts;
-        for (size_t i = 0; i < vertices.size(); i++) {
-            const Vertex2& currentVertex = vertices[i];
-            const Vertex2& nextVertex = vertices[(i + 1) % vertices.size()];
+        for (size_t i = 0; i < vertices.size(); i++)
+        {
+            const Vertex2 &currentVertex = vertices[i];
+            const Vertex2 &nextVertex = vertices[(i + 1) % vertices.size()];
 
-            if ((currentVertex.y <= static_cast<float>(y) && nextVertex.y > static_cast<float>(y))
-                || (nextVertex.y <= static_cast<float>(y) && currentVertex.y > static_cast<float>(y))) {
+            if ((currentVertex.y <= static_cast<float>(y) && nextVertex.y > static_cast<float>(y)) || (nextVertex.y <= static_cast<float>(y) && currentVertex.y > static_cast<float>(y)))
+            {
                 float xIntercept = currentVertex.x + (static_cast<float>(y) - currentVertex.y) *
-                    (nextVertex.x - currentVertex.x) / (nextVertex.y - currentVertex.y);
+                                                         (nextVertex.x - currentVertex.x) / (nextVertex.y - currentVertex.y);
                 xIntercepts.push_back(xIntercept);
             }
         }
 
         std::sort(xIntercepts.begin(), xIntercepts.end());
 
-        for (size_t i = 0; i < xIntercepts.size(); i += 2) {
+        for (size_t i = 0; i < xIntercepts.size(); i += 2)
+        {
             int startX = static_cast<int>(xIntercepts[i]);
             int endX = static_cast<int>(xIntercepts[i + 1]);
 
-            for (int x = startX; x <= endX; x++) {
-                point(Vertex2{ static_cast<float>(x), static_cast<float>(y) }, width, height);
+            for (int x = startX; x <= endX; x++)
+            {
+                point(Vertex2{static_cast<float>(x), static_cast<float>(y)}, width, height);
             }
         }
     }

@@ -8,8 +8,8 @@
 
 extern Color currentColor;
 extern std::vector<Color> framebuffer;
-const size_t framebufferWidth = 800;
-const size_t framebufferHeight = 600;
+const size_t framebufferWidth = 420;
+const size_t framebufferHeight = 420;
 
 void clear();
 void point(const Vertex2& vertex, size_t width, size_t height);
