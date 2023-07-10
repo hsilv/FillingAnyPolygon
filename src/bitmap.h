@@ -18,14 +18,39 @@ void render()
     clear();
 
     std::vector<Vertex2> polygon = {
-        {377.0f, 249.0f},
-        {411.0f, 197.0f},
-        {436.0f, 249.0f}};
+        {413.0f, 177.0f},
+        {448.0f, 159.0f},
+        {502.0f, 88.0f},
+        {553.0f, 53.0f},
+        {535.0f, 36.0f},
+        {676.0f, 37.0f},
+        {660.0f, 52.0f},
+        {750.0f, 145.0f},
+        {761.0f, 179.0f},
+        {672.0f, 192.0f},
+        {659.0f, 214.0f},
+        {615.0f, 214.0f},
+        {632.0f, 230.0f},
+        {580.0f, 230.0f},
+        {597.0f, 215.0f},
+        {552.0f, 214.0f},
+        {517.0f, 144.0f},
+        {466.0f, 180.0f}};
 
     setCurrentColor(Color(255, 255, 255));
     drawPolygon(polygon, framebufferWidth, framebufferHeight);
-    setCurrentColor(Color(255, 0, 0));
+    setCurrentColor(Color(0, 255, 0));
     fillPolygon(polygon, framebufferWidth, framebufferHeight);
+
+    std::vector<Vertex2> polygon2 = {
+        {682.0f, 175.0f},
+        {708.0f, 120.0f},
+        {735.0f, 148.0f},
+        {739.0f, 170.0f}};
+
+    setCurrentColor(Color(46, 52, 64));
+    drawPolygon(polygon2, framebufferWidth, framebufferHeight);
+    fillPolygon(polygon2, framebufferWidth, framebufferHeight);
 
     renderBuffer();
 }
