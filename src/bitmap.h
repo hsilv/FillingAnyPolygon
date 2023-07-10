@@ -1,13 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include "framebuffer.cpp"
+#include "bitmapwrite.h"
 
-
-size_t framebufferWidth = 800;
-size_t framebufferHeight = 200;
-const std::string filename = "output.bmp";
-
-void renderBuffer();
+void draw_centered_rectangle(size_t width, size_t height);
 
 void render() {
 
@@ -18,67 +13,30 @@ void render() {
     clear();
 
     setCurrentColor(Color(66, 135, 245));
-    point(Vertex2(10.0f, 10.0f), framebufferWidth, framebufferHeight); 
-    point(Vertex2(10.0f, 11.0f), framebufferWidth, framebufferHeight); 
-    point(Vertex2(10.0f, 12.0f), framebufferWidth, framebufferHeight); 
-    point(Vertex2{300.0f, 300.0f}, framebufferWidth, framebufferHeight);
+    draw_centered_rectangle(750, 550);
+
+    setCurrentColor(Color(255, 0, 0));
+    draw_centered_rectangle(150, 150);
+
+    setCurrentColor(Color(0, 255, 0));
+    draw_centered_rectangle(100, 100);
+
+    setCurrentColor(Color(0, 0, 255));
+    draw_centered_rectangle(50, 50);
+
+    setCurrentColor(Color(255, 0, 0));
     renderBuffer();
 }
 
-void renderBuffer() {
-    const size_t width = framebufferWidth;
-    const size_t height = framebufferHeight;
+void draw_centered_rectangle(size_t width, size_t height) {
+    float startVPoint = (framebufferHeight/2) - (height/2);
+    float startHPoint = (framebufferWidth/2) - (width/2);
 
-    constexpr int BMP_HEADER_SIZE = 14;
-    constexpr int DIB_HEADER_SIZE = 40;
-    const int paddingSize = (4 - (width * 3) % 4) % 4;
-    const int fileSize = BMP_HEADER_SIZE + DIB_HEADER_SIZE + (3 * width + paddingSize) * height;
-
-    char bmpHeader[BMP_HEADER_SIZE] = {
-        'B', 'M',
-        static_cast<char>(fileSize), static_cast<char>(fileSize >> 8), static_cast<char>(fileSize >> 16), static_cast<char>(fileSize >> 24),
-        0, 0, 0, 0,
-        static_cast<char>(BMP_HEADER_SIZE + DIB_HEADER_SIZE), static_cast<char>((BMP_HEADER_SIZE + DIB_HEADER_SIZE) >> 8), static_cast<char>((BMP_HEADER_SIZE + DIB_HEADER_SIZE) >> 16), static_cast<char>((BMP_HEADER_SIZE + DIB_HEADER_SIZE) >> 24)
-    };
-
-    char dibHeader[DIB_HEADER_SIZE] = {
-        static_cast<char>(DIB_HEADER_SIZE), static_cast<char>(DIB_HEADER_SIZE >> 8), static_cast<char>(DIB_HEADER_SIZE >> 16), static_cast<char>(DIB_HEADER_SIZE >> 24),
-        static_cast<char>(width), static_cast<char>(width >> 8), static_cast<char>(width >> 16), static_cast<char>(width >> 24),
-        static_cast<char>(height), static_cast<char>(height >> 8), static_cast<char>(height >> 16), static_cast<char>(height >> 24),
-        1, 0,
-        24, 0,
-        0, 0, 0, 0,
-        static_cast<char>((3 * width + paddingSize) * height), static_cast<char>(((3 * width + paddingSize) * height) >> 8), static_cast<char>(((3 * width + paddingSize) * height) >> 16), static_cast<char>(((3 * width + paddingSize) * height) >> 24),
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0
-    };
-
-    std::ofstream file(filename, std::ios::binary);
-    if (!file) {
-        std::cerr << "Error al abrir el archivo " << filename << std::endl;
-        return;
-    }
-
-    file.write(bmpHeader, BMP_HEADER_SIZE);
-    file.write(dibHeader, DIB_HEADER_SIZE);
-
-    for (size_t y = 0; y < height; y++) {
-        for (size_t x = 0; x < width; x++) {
-            size_t index = y * width + x;
-            Color color = framebuffer[index];
-            file.write(reinterpret_cast<const char*>(&color.getBlue()), 1);
-            file.write(reinterpret_cast<const char*>(&color.getGreen()), 1);
-            file.write(reinterpret_cast<const char*>(&color.getRed()), 1);
-        }
-
-        for (int i = 0; i < paddingSize; i++) {
-            file.put(0);
+    for (float i = startVPoint; i <= startVPoint+height; i++)
+    {
+        for (float j = startHPoint; j <= startHPoint+width; j++)
+        {
+            point(Vertex2(j, i), framebufferWidth, framebufferHeight);
         }
     }
-
-    file.close();
-
-    std::cout << "Archivo " << filename << " generado correctamente." << std::endl;
-};
+}

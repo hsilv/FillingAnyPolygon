@@ -6,7 +6,6 @@ Color clearColor(0, 0, 0); // Color base o por defecto del framebuffer
 Color currentColor(0, 0, 0);
 
 std::vector<Color> framebuffer; // Vector unidimensional para representar el framebuffer
-
 void setClearColor(Color newColor)
 {
     clearColor = newColor;
